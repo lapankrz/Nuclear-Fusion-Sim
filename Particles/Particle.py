@@ -29,10 +29,11 @@ class Particle:
     def get_velocity(self):
         return np.array([self.vx, self.vy, self.vz])
     
-    # modify particle parameters based on influence from some particle
+    # modify particle velocity based on influence from some particle
     def get_influence_from(self, particle):
         pass #TODO add influence from particle
-
+    
+    # modify position by current velocity value
     def update_position(self):
         self.x += self.vx
         self.y += self.vy

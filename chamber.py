@@ -11,7 +11,6 @@ class Chamber:
         self.x = x
         self.y = y
         self.z = z
-
         self.particle_number = particle_number
         self.particles = np.empty(particle_number, Particle)
     
@@ -30,18 +29,14 @@ class Chamber:
 
     # update particle parameters
     def update_particles(self):
-        new_particles = np.empty(self.particle_number, Particle)
         for i in range(0, self.particle_number):
             p1 = self.particles[i]
-            new_particle = Particle(p1.x, p1.y, p1.z, p1.vx, p1.vy, p1.vz)
             for j in range(0, self.particle_number):
-                if (i == j):
-                    continue
-                p2 = self.particles[j]
-                new_particle.get_influence_from(p2)
-            new_particle.update_position()
-            new_particles[i] = new_particle
-        self.particles = new_particles
+                if (i != j):
+                    p2 = self.particles[j]
+                    p1.get_influence_from(p2)
+        for p in self.particles:
+            p.update_position()
         self.clip_to_bounds()
 
     # clip particles inside the chamber
