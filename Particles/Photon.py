@@ -1,4 +1,4 @@
-from Particle import Particle
+from .particle import Particle
 from scipy import constants as C
 from math import sqrt, pi, inf
 
