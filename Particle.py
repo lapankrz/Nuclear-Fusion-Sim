@@ -1,7 +1,6 @@
 from numpy import *
 from scipy import constants as C
 from math import *
-import VectorsPY as v
 
 
 class Particle:
