@@ -31,7 +31,7 @@ class Particle:
     
     # modify particle velocity based on influence from some particle
     def get_influence_from(self, particle):
-        pass #TODO add influence from particle
+        pass #TODO add influence from particle - implement in subclasses
     
     # modify position by current velocity value
     def update_position(self):
