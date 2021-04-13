@@ -4,8 +4,10 @@ import matplotlib.animation as animation
 from math import sqrt
 from time import sleep
 from chamber import Chamber
+from laser import Laser
 
-chamber = Chamber()
+laser = Laser()
+chamber = Chamber(laser)
 chamber.create_particles()
 
 fig = plt.figure()

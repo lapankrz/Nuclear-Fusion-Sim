@@ -5,7 +5,7 @@ from math import sqrt, pi, inf
 class Photon(Particle):
     def __init__(self, x=0, y=0, z=0, vx=0, vy=0, vz=0, temperature=298.15,
                 DFBWavelength=1000 * 10 ** -9, **other_properties):
-        Particle.__init__(self, x=0, y=0, z=0, vx=0, vy=0, vz=0, temperature=298.15,**other_properties)
+        Particle.__init__(self, x, y, z, vx, vy, vz, temperature, **other_properties)
         self.type = "Elementary particle"
         self.statistics = "Boson"  # Elementary particle
         self.compounds = {"elementary"}

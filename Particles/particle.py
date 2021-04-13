@@ -30,8 +30,16 @@ class Particle:
         return np.array([self.vx, self.vy, self.vz])
     
     # modify particle velocity based on influence from some particle
+    # returns true if fusion occured, false otherwise
     def get_influence_from(self, particle):
-        pass #TODO add influence from particle - implement in subclasses
+        return False #TODO add influence from particle - implement in subclasses
+
+    def fusion_can_occur(self, particle):
+        return False
+
+    def get_distance_to(self, particle):
+        ret = sqrt((self.x - particle.x)**2 + (self.y - particle.y)**2 + (self.z - particle.z)**2)
+        return ret
     
     # modify position by current velocity value
     def update_position(self):
