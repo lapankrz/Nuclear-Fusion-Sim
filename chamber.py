@@ -4,56 +4,68 @@ from random import Random
 from Particles.particle import Particle
 from Particles.triton import Triton
 from Particles.deuteron import Deuteron
+from Particles.helion import Helion
+from Particles.neutron import Neutron
 
 max_v = 0.1
 
 class Chamber:
-    def __init__(self, laser, x=1, y=1, z=1, particle_number=2):
+    def __init__(self, laser, x=1, y=1, z=1, particle_pairs=15, simultaneous = False):
         # chamber dimensions
         self.laser = laser
         self.x = float(x)
         self.y = float(y)
         self.z = float(z)
-        self.particle_number = particle_number
-        self.particles = list() #np.empty(particle_number, Particle)
+        self.particle_pairs = particle_pairs
+        self.simultaneous = simultaneous # if true - all particles created at once, otherwise one pair at a time
+        self.particles = list()
+        self.total_energy_released = 0
+        self.reaction_count = 0
     
     # create particles with random positions and velocities
     def create_particles(self):
+        if (self.simultaneous):
+            for _ in range(0, self.particle_pairs):
+                x, y, z = self.get_random_position()
+                vx, vy, vz = self.get_random_velocity()
+                deuteron = Deuteron(x, y, z, vx, vy, vz)
+                self.particles.append(deuteron)
 
-        deuteron = Deuteron(0, self.y / 2, self.z / 2, 0.02)
-        triton = Triton(self.x, self.y / 2, self.z / 2, -0.02)
-        self.particles.append(deuteron)
-        self.particles.append(triton)
-
-        # for _ in range(0, self.particle_number):
-        #     random = Random()
-        #     x = random.uniform(0, self.x)
-        #     y = random.uniform(0, self.y)
-        #     z = random.uniform(0, self.z)
-        #     vx = random.uniform(0, max_v)
-        #     vy = random.uniform(0, max_v)
-        #     vz = random.uniform(0, max_v)
-        #     particle = Particle(x, y, z, vx, vy, vz)
-        #     self.particles.append(particle)
+                x, y, z = self.get_random_position()
+                vx, vy, vz = self.get_random_velocity()
+                triton = Triton(x, y, z, vx, vy, vz)
+                self.particles.append(triton)
+        else:
+            deuteron = Deuteron(0, self.y / 2, self.z / 2, 0.02)
+            triton = Triton(self.x, self.y / 2, self.z / 2, -0.02)
+            self.particles.append(deuteron)
+            self.particles.append(triton)
 
     # update particle parameters
     def update_particles(self):
-        for i in range(0, self.particle_number):
+        for i in range(0, len(self.particles)):
             p1 = self.particles[i]
-            for j in range(0, self.particle_number):
+            for j in range(0, len(self.particles)):
                 if (i != j):
                     p2 = self.particles[j]
                     if (p1.fusion_can_occur(p2)):
-                        helion, neutron = p1.execute_fusion(p2)
+                        helion, neutron = self.execute_fusion(p1, p2)
                         self.particles[i] = helion
                         self.particles[j] = neutron
                     p1.get_influence_from(p2)
         for p in self.particles:
             p.update_position()
         self.clip_to_bounds()
-    
-    def on_fusion_occurred(self, helion, neutron):
-        pass
+
+    # carry out nuclear fusion
+    def execute_fusion(self, deuteron, triton):
+        helion = Helion(deuteron.x, deuteron.y, deuteron.z)
+        neutron = Neutron(triton.x, triton.y, triton.z)
+        energy = 0 #TODO calculate energy released
+        self.reaction_count += 1
+        self.total_energy_released += energy
+        print('Total reactions: ' + str(self.reaction_count))
+        return helion, neutron
 
     # clip particles inside the chamber
     def clip_to_bounds(self):
@@ -78,3 +90,17 @@ class Chamber:
             elif (p.z > self.z):
                 p.vz = -p.vz
                 p.z = self.z
+
+    def get_random_position(self):
+        random = Random()
+        x = random.uniform(0, self.x)
+        y = random.uniform(0, self.y)
+        z = random.uniform(0, self.z)
+        return x, y, z
+
+    def get_random_velocity(self):
+        random = Random()
+        vx = random.uniform(-max_v, max_v)
+        vy = random.uniform(-max_v, max_v)
+        vz = random.uniform(-max_v, max_v)
+        return vx, vy, vz

@@ -5,7 +5,7 @@ from .triton import Triton
 from .helion import Helion
 from scipy import constants as C
 
-min_fusion_dist = 0.01 # TEMPORARY
+min_fusion_dist = 0.06 # TEMPORARY
 
 # Nucleus of deuterium
 class Deuteron(Particle):
@@ -20,11 +20,6 @@ class Deuteron(Particle):
     
     def fusion_can_occur(self, particle):
         return isinstance(particle, Triton) and self.get_distance_to(particle) < min_fusion_dist
-
-    def execute_fusion(self, triton):
-        helion = Helion(self.x, self.y, self.z)
-        neutron = Neutron(triton.x, triton.y, triton.z)
-        return helion, neutron
 
     def get_color(self):
         return '#ff1a00'

@@ -49,4 +49,4 @@ class Particle:
 
     # get unique color for this particle type (used for plotting)
     def get_color(self):
-        pass
+        return '#000000'
