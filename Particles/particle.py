@@ -46,3 +46,7 @@ class Particle:
         self.x += self.vx
         self.y += self.vy
         self.z += self.vz
+
+    # get unique color for this particle type (used for plotting)
+    def get_color(self):
+        pass

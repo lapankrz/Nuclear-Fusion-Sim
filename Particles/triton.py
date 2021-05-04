@@ -12,3 +12,6 @@ class Triton(Particle):
         self.mass_kg = C.value("triton mass")  # [kg]
         self.charge = 2 * C.value("elementary charge")  # [C]
         self.magneticDipoleMoment = C.value("triton mag. mom.")  # [J*T**-1]
+
+    def get_color(self):
+        return '#2254dd'

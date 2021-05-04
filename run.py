@@ -20,7 +20,7 @@ def animate(i):
         x = p.x
         y = p.y
         z = p.z
-        ax.scatter(x, y, z)
+        ax.scatter(x, y, z, c=[p.get_color()])
     
     ax.set_xlim([0, chamber.x])
     ax.set_ylim([0, chamber.y])

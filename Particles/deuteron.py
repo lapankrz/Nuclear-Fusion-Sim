@@ -25,3 +25,6 @@ class Deuteron(Particle):
         helion = Helion(self.x, self.y, self.z)
         neutron = Neutron(triton.x, triton.y, triton.z)
         return helion, neutron
+
+    def get_color(self):
+        return '#ff1a00'
