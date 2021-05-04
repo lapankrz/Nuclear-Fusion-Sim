@@ -3,7 +3,7 @@ from scipy import constants as C
 
 class Proton(Particle):
     def __init__(self, x=0, y=0, z=0, vx=0, vy=0, vz=0, temperature=298.15,**other_properties):
-        Particle.__init__(self, x=0, y=0, z=0, vx=0, vy=0, vz=0, temperature=298.15,**other_properties)
+        Particle.__init__(self, x, y, z, vx, vy, vz, temperature, **other_properties)
         self.type = "Baryon"
         self.statistics = "Fermion"
         self.compounds = {"u", "u", "d"}
