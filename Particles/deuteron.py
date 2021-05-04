@@ -1,7 +1,11 @@
 from .particle import Particle
 from .proton import Proton
 from .neutron import Neutron
+from .triton import Triton
+from .helion import Helion
 from scipy import constants as C
+
+min_fusion_dist = 0.01 # TEMPORARY
 
 # Nucleus of deuterium
 class Deuteron(Particle):
@@ -13,3 +17,14 @@ class Deuteron(Particle):
         self.charge = C.value("elementary charge")  # [C]
         self.radius = C.value("deuteron rms charge radius")  # [m]
         self.magneticDipoleMoment = C.value("deuteron mag. mom.")  # [J*T**-1]
+    
+    def fusion_can_occur(self, particle):
+        return isinstance(particle, Triton) and self.get_distance_to(particle) < min_fusion_dist
+
+    def execute_fusion(self, triton):
+        helion = Helion(self.x, self.y, self.z)
+        neutron = Neutron(triton.x, triton.y, triton.z)
+        return helion, neutron
+
+    def get_color(self):
+        return '#ff1a00'

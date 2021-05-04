@@ -12,3 +12,6 @@ class Helion(Particle):
         self.mass_kg = C.value("helion mass")  # [kg]
         self.charge = 2 * C.value("elementary charge")  # [C]
         self.magneticDipoleMoment = C.value("helion mag. mom.")  # [J*T**-1]
+
+    def get_color(self):
+        return '#ffe800'

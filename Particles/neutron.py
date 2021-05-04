@@ -17,3 +17,6 @@ class Neutron(Particle):
         self.electricDipoleMoment = 2.9 * 10 ** -26  # [e*cm]
         self.electricPolarizability = 1.1615 * 10 ** -3  # [f*m**3]
         self.magneticPolarizability = 3.720 * 10 ** -4  # [f*m**3]
+
+    def get_color(self):
+        return '#28d73c'
