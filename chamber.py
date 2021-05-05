@@ -6,8 +6,12 @@ from Particles.triton import Triton
 from Particles.deuteron import Deuteron
 from Particles.helion import Helion
 from Particles.neutron import Neutron
+from scipy import constants as C
 
 max_v = 0.1
+energy_released_in_MeV = 17.59
+neutron_energy_ratio = 0.7987
+MeV_in_Joules = 1.6021773E-13
 
 class Chamber:
     def __init__(self, laser, x=1, y=1, z=1, particle_pairs=15, simultaneous = False):
@@ -59,12 +63,15 @@ class Chamber:
 
     # carry out nuclear fusion
     def execute_fusion(self, deuteron, triton):
-        helion = Helion(deuteron.x, deuteron.y, deuteron.z)
-        neutron = Neutron(triton.x, triton.y, triton.z)
-        energy = 0 #TODO calculate energy released
         self.reaction_count += 1
-        self.total_energy_released += energy
-        print('Total reactions: ' + str(self.reaction_count))
+        self.total_energy_released += energy_released_in_MeV
+        print('Total reactions: ' + str(self.reaction_count) + ", total energy: " + str(self.total_energy_released) + " MeV")
+
+        helion = Helion(triton.x, triton.y, triton.z)
+        neutron = Neutron(deuteron.x, deuteron.y, deuteron.z)
+        neutron_energy = neutron_energy_ratio * energy_released_in_MeV * MeV_in_Joules # in Joules
+        helion_energy = (energy_released_in_MeV * MeV_in_Joules) - neutron_energy # in Joules
+
         return helion, neutron
 
     # clip particles inside the chamber
