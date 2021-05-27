@@ -14,7 +14,7 @@ neutron_energy_ratio = 0.7987
 MeV_in_Joules = 1.6021773E-13
 
 class Chamber:
-    def __init__(self, laser, x=1, y=1, z=1, particle_pairs=15, simultaneous = False):
+    def __init__(self, laser, x=1, y=1, z=1, particle_pairs=8, simultaneous = False):
         # chamber dimensions
         self.laser = laser
         self.x = float(x)
@@ -40,8 +40,8 @@ class Chamber:
                 triton = Triton(x, y, z, vx, vy, vz)
                 self.particles.append(triton)
         else:
-            deuteron = Deuteron(0, self.y / 2, self.z / 2, 0.02)
-            triton = Triton(self.x, self.y / 2, self.z / 2, -0.02)
+            deuteron = Deuteron(0, self.y / 2, self.z / 2, 0.05)
+            triton = Triton(self.x, self.y / 2, self.z / 2, -0.05)
             self.particles.append(deuteron)
             self.particles.append(triton)
 
@@ -67,35 +67,46 @@ class Chamber:
         self.total_energy_released += energy_released_in_MeV
         print('Total reactions: ' + str(self.reaction_count) + ", total energy: " + str(self.total_energy_released) + " MeV")
 
-        helion = Helion(triton.x, triton.y, triton.z)
-        neutron = Neutron(deuteron.x, deuteron.y, deuteron.z)
-        neutron_energy = neutron_energy_ratio * energy_released_in_MeV * MeV_in_Joules # in Joules
-        helion_energy = (energy_released_in_MeV * MeV_in_Joules) - neutron_energy # in Joules
+        helion = Helion(triton.position.x, triton.position.y, triton.position.z)
+        neutron = Neutron(deuteron.position.x, deuteron.position.y, deuteron.position.z)
+
+        input_energy = triton.get_kinetic_energy() + deuteron.get_kinetic_energy()
+        output_energy = input_energy + energy_released_in_MeV * MeV_in_Joules
+        neutron_energy = neutron_energy_ratio *  output_energy # in Joules
+        helion_energy = output_energy - neutron_energy # in Joules
+
+        helion_speed = sqrt(2 * helion_energy / helion.mass_kg)
+        helion.velocity = deuteron.velocity.normalize() * helion_speed
+
+        neutron_speed = sqrt(2 * neutron_energy / neutron.mass_kg)
+        neutron.velocity = deuteron.velocity.normalize() * neutron_speed
 
         return helion, neutron
 
     # clip particles inside the chamber
     def clip_to_bounds(self):
-        for p in self.particles:
+        for particle in self.particles:
+            p = particle.position
+            v = particle.velocity
             if (p.x < 0):
-                p.vx = -p.vx
+                v.x = -v.x
                 p.x = 0
             elif (p.x > self.x):
-                p.vx = -p.vx
+                v.x = -v.x
                 p.x = self.x
                 
             if (p.y < 0):
-                p.vy = -p.vy
+                v.y = -v.y
                 p.y = 0
             elif (p.y > self.y):
-                p.vy = -p.vy
+                v.y = -v.y
                 p.y = self.y
 
             if (p.z < 0):
-                p.vz = -p.vz
+                v.z = -v.z
                 p.z = 0
             elif (p.z > self.z):
-                p.vz = -p.vz
+                v.z = -v.z
                 p.z = self.z
 
     def get_random_position(self):

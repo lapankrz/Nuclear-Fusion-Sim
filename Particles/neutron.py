@@ -9,7 +9,7 @@ class Neutron(Particle):
         self.compounds = {"u", "d", "d"}
         self.mass_MeV = C.value("neutron mass energy equivalent in MeV")  # [MeV/c2]
         self.mass_kg = C.value("neutron mass")  # [kg]
-        self.charge = 0  # [C] (theoretical)
+        self.charge = 0  # [C]
         self.spin = 1 / 2
         self.radius = 0.8 * 10 ** -15  # [m]
         self.meanLifetime = 879.466  # [s]
@@ -19,4 +19,4 @@ class Neutron(Particle):
         self.magneticPolarizability = 3.720 * 10 ** -4  # [f*m**3]
 
     def get_color(self):
-        return '#28d73c'
+        return '#28d73c' # green

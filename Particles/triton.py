@@ -14,4 +14,4 @@ class Triton(Particle):
         self.magneticDipoleMoment = C.value("triton mag. mom.")  # [J*T**-1]
 
     def get_color(self):
-        return '#2254dd'
+        return '#2254dd' # blue
