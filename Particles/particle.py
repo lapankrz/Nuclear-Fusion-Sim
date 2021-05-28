@@ -3,8 +3,8 @@ from math import sqrt
 from scipy import constants as C
 from vectormath import Vector3
 
-proportion_constant = 1e31
-max_speed = 0.2
+proportion_constant = 1e30
+max_speed = 0.4
 
 class Particle:
     def __init__(self, x=0, y=0, z=0, vx=0, vy=0, vz=0, temperature=298.15, **other_properties):

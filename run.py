@@ -7,8 +7,19 @@ from chamber import Chamber
 from laser import Laser
 
 
+print('''\nSimulation scenarios:
+(1) Chamber full of particles
+(2) Pair of particles colliding head on
+(3) Pair of particles colliding at an angle''')
+scenario = int(input("Choose scenario: "))
+
+if (scenario > 1):
+    speed_percent = float(input('''\nChoose fraction of minimal particle speed for reaction to appear: '''))
+else:
+    speed_percent = 1.0
+
 laser = Laser()
-chamber = Chamber(laser, simultaneous=True)
+chamber = Chamber(laser, scenario=scenario, speed_percent=speed_percent)
 chamber.create_particles()
 
 fig = plt.figure()

@@ -12,36 +12,46 @@ max_v = 0.1
 energy_released_in_MeV = 17.59
 neutron_energy_ratio = 0.7987
 MeV_in_Joules = 1.6021773E-13
+start_speeds = [0.03, 0.023, 0.0232]
 
 class Chamber:
-    def __init__(self, laser, x=1, y=1, z=1, particle_pairs=8, simultaneous = False):
+    def __init__(self, laser, x=1, y=1, z=1, particle_pairs=8, scenario = 1, speed_percent = 1.1):
         # chamber dimensions
         self.laser = laser
         self.x = float(x)
         self.y = float(y)
         self.z = float(z)
         self.particle_pairs = particle_pairs
-        self.simultaneous = simultaneous # if true - all particles created at once, otherwise one pair at a time
+        self.scenario = scenario
+        self.speed_percent = speed_percent
         self.particles = list()
         self.total_energy_released = 0
         self.reaction_count = 0
     
     # create particles with random positions and velocities
     def create_particles(self):
-        if (self.simultaneous):
+        start_speed = start_speeds[self.scenario - 1] * self.speed_percent
+        if (self.scenario == 1):
             for _ in range(0, self.particle_pairs):
                 x, y, z = self.get_random_position()
                 vx, vy, vz = self.get_random_velocity()
                 deuteron = Deuteron(x, y, z, vx, vy, vz)
+                deuteron.velocity = deuteron.velocity.normalize() * start_speed
                 self.particles.append(deuteron)
 
                 x, y, z = self.get_random_position()
                 vx, vy, vz = self.get_random_velocity()
                 triton = Triton(x, y, z, vx, vy, vz)
+                triton.velocity = triton.velocity.normalize() * start_speed
                 self.particles.append(triton)
-        else:
-            deuteron = Deuteron(0, self.y / 2, self.z / 2, 0.05)
-            triton = Triton(self.x, self.y / 2, self.z / 2, -0.05)
+        elif (self.scenario == 2):
+            deuteron = Deuteron(0, self.y / 2, self.z / 2, start_speed)
+            triton = Triton(self.x, self.y / 2, self.z / 2, -start_speed)
+            self.particles.append(deuteron)
+            self.particles.append(triton)
+        elif (self.scenario == 3):
+            deuteron = Deuteron(0, 0, self.z / 2, start_speed, start_speed)
+            triton = Triton(self.x, 0, self.z / 2, -start_speed, start_speed)
             self.particles.append(deuteron)
             self.particles.append(triton)
 
