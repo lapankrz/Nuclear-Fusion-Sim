@@ -16,7 +16,8 @@ class Particle:
             setattr(self, name, value)
     
     def get_speed(self):
-        return sqrt(self.vx**2 + self.vy**2  + self.vz**2)
+        v = self.velocity
+        return sqrt(v.x**2 + v.y**2  + v.z**2)
     
     # modify particle velocity based on influence from some particle
     # returns true if fusion occured, false otherwise
@@ -50,4 +51,4 @@ class Particle:
         return particle.position - self.position
 
     def get_kinetic_energy(self):
-        return self.mass_kg * self.velocity.length**2 / 2
+        return self.mass_kg * self.get_speed()**2 / 2

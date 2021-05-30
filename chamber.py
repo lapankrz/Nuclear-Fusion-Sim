@@ -12,10 +12,10 @@ max_v = 0.1
 energy_released_in_MeV = 17.59
 neutron_energy_ratio = 0.7987
 MeV_in_Joules = 1.6021773E-13
-start_speeds = [0.03, 0.023, 0.0232]
+start_speeds = [0.06, 0.023, 0.0232]
 
 class Chamber:
-    def __init__(self, laser, x=1, y=1, z=1, particle_pairs=8, scenario = 1, speed_percent = 1.1):
+    def __init__(self, laser, x=1, y=1, z=1, particle_pairs=10, scenario = 1, speed_percent = 1.1):
         # chamber dimensions
         self.laser = laser
         self.x = float(x)
@@ -46,12 +46,12 @@ class Chamber:
                 self.particles.append(triton)
         elif (self.scenario == 2):
             deuteron = Deuteron(0, self.y / 2, self.z / 2, start_speed)
-            triton = Triton(self.x, self.y / 2, self.z / 2, -start_speed)
+            triton = Triton(self.x, self.y / 2, self.z / 2 + 0.01, -start_speed)
             self.particles.append(deuteron)
             self.particles.append(triton)
         elif (self.scenario == 3):
             deuteron = Deuteron(0, 0, self.z / 2, start_speed, start_speed)
-            triton = Triton(self.x, 0, self.z / 2, -start_speed, start_speed)
+            triton = Triton(self.x, 0, self.z / 2 + 0.01, -start_speed, start_speed)
             self.particles.append(deuteron)
             self.particles.append(triton)
 
@@ -86,7 +86,7 @@ class Chamber:
         helion_energy = output_energy - neutron_energy # in Joules
 
         helion_speed = sqrt(2 * helion_energy / helion.mass_kg)
-        helion.velocity = deuteron.velocity.normalize() * helion_speed
+        helion.velocity = triton.velocity.normalize() * helion_speed
 
         neutron_speed = sqrt(2 * neutron_energy / neutron.mass_kg)
         neutron.velocity = deuteron.velocity.normalize() * neutron_speed
