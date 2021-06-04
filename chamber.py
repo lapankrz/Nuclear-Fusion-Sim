@@ -15,12 +15,13 @@ import random
 energy_released_in_MeV = 17.59
 neutron_energy_ratio = 0.7987
 MeV_in_Joules = 1.6021773E-13
-start_speeds = [1e6, 1e5, 1]
+start_speeds = [1e6, 5e-12, 2e-12, 5e-12, 2e-12]
 wallCoeff = 0.2  # percent of grabbed energy
-chamber_size = 1e-2
+chamber_sizes = [1e-2, 2e-10, 2e-10, 2e-10, 2e-10]
+fusion_distance_ratio = 5e-2
 
 class Chamber:
-    def __init__(self, laser, x=chamber_size, y=chamber_size, z=chamber_size, particle_pairs=10, scenario=1):
+    def __init__(self, laser, x=1, y=1, z=1, scenario=1, particle_pairs=10):
         # chamber dimensions
         self.laser = laser
         self.x = float(x)
@@ -37,14 +38,23 @@ class Chamber:
         self.KEavg = 0
         self.Time = 0
         self.iterator = 1
-        self.current_max_v = 0
-        self.dt = 1e-9  # [ s ]
+        self.dt = 1e-9 # [ s ]
+        self.min_fusion_dist = 5e-4
+        self.set_up_scenario()
 
+    def set_up_scenario(self):
+        if (self.scenario <= 5):
+            chamber_size = chamber_sizes[self.scenario - 1]
+            self.x = self.y = self.z = chamber_size
+            self.min_fusion_dist = chamber_size * fusion_distance_ratio
 
     # create particles with random positions and velocities
     def create_particles(self):
-        start_speed = start_speeds[self.scenario - 1]
-        if self.scenario == 1:
+        if self.scenario <= 5:
+            start_speed = start_speeds[self.scenario - 1]
+        else:
+            start_speed = start_speeds[0] # TEMPORARY
+        if self.scenario == 1 or self.scenario == 6:
             for _ in range(0, self.particle_pairs):
                 x, y, z = self.get_random_position()
                 vx, vy, vz = self.get_random_velocity(1)
@@ -56,40 +66,46 @@ class Chamber:
                 triton = Triton(x, y, z, vx, vy, vz)
                 triton.velocity = triton.velocity.normalize() * start_speed
                 self.particles.append(triton)
-        elif self.scenario == 2:
+        elif self.scenario == 2 or self.scenario == 3:
             deuteron = Deuteron(0, self.y / 2, self.z / 2, start_speed)
-            triton = Triton(self.x, self.y / 2, self.z / 2, -start_speed)
+            triton = Triton(self.x, self.y / 2, 1.01 * self.z / 2, -start_speed)
             self.particles.append(deuteron)
             self.particles.append(triton)
-        elif self.scenario == 3:
+        elif self.scenario == 4 or self.scenario == 5:
             deuteron = Deuteron(0, 0, self.z / 2, start_speed, start_speed)
-            triton = Triton(self.x, 0, self.z / 2, -start_speed, start_speed)
+            triton = Triton(self.x, 0, 1.01 * self.z / 2, -start_speed, start_speed)
             self.particles.append(deuteron)
             self.particles.append(triton)
 
     # update particle parameters
     def update_particles(self):
-        if self.scenario > 1 and self.current_max_v != 0:
-            self.dt = 1e-3 / self.current_max_v
-        self.current_max_v = 0
+        current_max_v = 0
         for i in range(0, len(self.particles)):
             p1 = self.particles[i]
             for j in range(0, len(self.particles)):
                 if i != j:
                     p2 = self.particles[j]
-                    if p1.fusion_can_occur(p2):
+                    if self.fusion_can_occur(p1, p2):
                         helion, neutron = self.execute_fusion(p1, p2)
                         self.particles[i] = helion
                         self.particles[j] = neutron
-                    p1.get_influence_from(p2)
+                    p1.get_influence_from(p2, self.dt)
+            speed = p1.get_speed()
+            if (speed > current_max_v):
+                current_max_v = speed
+        if self.scenario > 1 and current_max_v != 0:
+            self.dt = (self.x / 20) / current_max_v # so that it takes 20 frames to move across chamber
         for p in self.particles:
             p.update_position(self.dt)
-            p.gravity_influence(self.dt)
-            speed = p.get_speed()
-            if (speed > self.current_max_v):
-                self.current_max_v = speed
+            
         self.clip_to_bounds()
         self.Time += self.dt
+
+    def fusion_can_occur(self, p1, p2):
+        if p1.get_distance_to(p2) < self.min_fusion_dist:
+            if (isinstance(p1, Triton) and isinstance(p2, Deuteron)) or (isinstance(p1, Deuteron) and isinstance(p2, Triton)):
+                return True
+        return False
 
     # carry out nuclear fusion
     def execute_fusion(self, deuteron, triton):
@@ -185,6 +201,5 @@ class Chamber:
         energy_per_particle = KELost / particle_count
         for i in range(0, particle_count):
             p = self.particles[i]
-            vel = sqrt(2 * energy_per_particle / p.mass_kg)
-            p.velocity += vel**(1/3)
-        return v * (1 - wallCoeff)
+            # p.add_energy(energy_per_particle)
+        return v * sqrt(1 - wallCoeff)
