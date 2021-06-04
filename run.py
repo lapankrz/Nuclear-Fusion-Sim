@@ -6,20 +6,14 @@ from time import sleep
 from chamber import Chamber
 from laser import Laser
 
-
 print('''\nSimulation scenarios:
 (1) Chamber full of particles
 (2) Pair of particles colliding head on
 (3) Pair of particles colliding at an angle''')
 scenario = int(input("Choose scenario: "))
 
-if (scenario > 1):
-    speed_percent = float(input('''\nChoose fraction of minimal particle speed for reaction to appear: '''))
-else:
-    speed_percent = 1.0
-
 laser = Laser()
-chamber = Chamber(laser, scenario=scenario, speed_percent=speed_percent)
+chamber = Chamber(laser, scenario=scenario)
 chamber.create_particles()
 
 fig = plt.figure()
@@ -33,12 +27,22 @@ def animate(i):
         y = p.position.y
         z = p.position.z
         ax.scatter(x, y, z, c=[p.get_color()])
-    
+        plt.title( "Time:                        " + '{:<.3e}'.format(chamber.Time) + " [s]" + "\n"
+                 + "Subtracted Energy:   " + '{:<.3e}'.format(chamber.sub_energy) + " [J] " + "\n"
+                 + "Total reactions:    " + str(chamber.reaction_count) + "\n"
+                 + "Total released energy: " + '{:<.2f}'.format(chamber.total_energy_released) + " [MeV] " + "\n"
+                 + "Temperature:            " + '{:<.3e}'.format(chamber.Temperature) + " [K]" + "\n"
+                 + "Pressure:                  " + '{:<.3e}'.format(chamber.Pressure) + " [Pa]", loc="left", fontsize=8)
     ax.set_xlim([0, chamber.x])
     ax.set_ylim([0, chamber.y])
     ax.set_zlim([0, chamber.z])
+    ax.set_xlabel('X axis [m] ')
+    ax.set_ylabel('Y axis [m] ')
+    ax.set_zlabel('Z axis [m] ')
 
-ani = animation.FuncAnimation(fig, animate, interval=10)
+
+# file_name = str(input("Choose fileName: "))
+# file_name = "./gifs/" + file_name + '.gif'
+ani = animation.FuncAnimation(fig, animate, frames=150, interval=50)
+# ani.save(file_name, writer='pillow', fps=1000, dpi=80)
 plt.show()
-
-
