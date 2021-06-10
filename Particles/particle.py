@@ -1,4 +1,3 @@
-import numpy as np
 from math import sqrt
 from scipy import constants as C
 from vectormath import Vector3
@@ -40,7 +39,8 @@ class Particle:
     def add_energy(self, energy):
         current_energy = self.get_kinetic_energy()
         new_speed = sqrt(2 * (current_energy + energy) / self.mass_kg)
-        self.velocity = self.velocity.normalize() * new_speed
+        self.velocity.normalize()
+        self.velocity *= new_speed
         
     # get unique color for this particle type (used for plotting)
     def get_color(self):

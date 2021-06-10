@@ -1,8 +1,5 @@
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from math import sqrt
-from time import sleep
 from chamber import Chamber
 from laser import Laser
 
@@ -16,11 +13,15 @@ print('''\nSimulation scenarios:
 (5) Pair of particles at an angle (without collision)
 (6) Custom simulation
 ''')
-scenario = int(input("Choose scenario: "))
+scenario = int(input("Choose scenario: ") or "1")
 chamber = Chamber(laser, scenario=scenario)
 
 if scenario == 6:
-    particle_pairs = int(input("\nNumber of D+T pairs: "))
+    particle_pairs = int(input("\nNumber of D+T pairs [10]: ") or "10")
+    wavelength = float(input("Laser wavelength [3.51e-8 m]: ") or "3.51e-8")
+    intensity = float(input("Laser intensity [5e17 W/m^2]: ") or "5e17")
+    activation_time = int(input("Laser activation time [1 s]: ") or "1")
+    laser = Laser(wavelength, intensity, activation_time)
     chamber = Chamber(laser, scenario=scenario, particle_pairs=particle_pairs)
 
 chamber.create_particles()

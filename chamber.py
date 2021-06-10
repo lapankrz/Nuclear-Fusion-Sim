@@ -1,5 +1,4 @@
-import numpy as np
-from math import *
+from math import sqrt
 from random import Random
 
 from Particles import particle
@@ -16,7 +15,7 @@ energy_released_in_MeV = 17.59
 neutron_energy_ratio = 0.7987
 MeV_in_Joules = 1.6021773E-13
 start_speeds = [1e6, 5e-12, 2e-12, 5e-12, 2e-12]
-wallCoeff = 0.2  # percent of grabbed energy
+wallCoeff = 0.3  # percent of grabbed energy
 chamber_sizes = [1e-2, 2e-10, 2e-10, 2e-10, 2e-10]
 fusion_distance_ratio = 5e-2
 
@@ -53,7 +52,10 @@ class Chamber:
         if self.scenario <= 5:
             start_speed = start_speeds[self.scenario - 1]
         else:
-            start_speed = start_speeds[0] # TEMPORARY
+            surface_area = self.get_chamber_surface_area()
+            laser_energy = self.laser.get_initial_energy(surface_area)
+            particle_energy = laser_energy / (self.particle_pairs * 2)
+            start_speed = sqrt(2 * particle_energy / Deuteron().mass_kg)
         if self.scenario == 1 or self.scenario == 6:
             for _ in range(0, self.particle_pairs):
                 x, y, z = self.get_random_position()
@@ -93,8 +95,8 @@ class Chamber:
             speed = p1.get_speed()
             if (speed > current_max_v):
                 current_max_v = speed
-        if self.scenario > 1 and current_max_v != 0:
-            self.dt = (self.x / 20) / current_max_v # so that it takes 20 frames to move across chamber
+        if self.scenario > 0 and current_max_v != 0:
+            self.set_dt(current_max_v)
         for p in self.particles:
             p.update_position(self.dt)
             
@@ -111,8 +113,6 @@ class Chamber:
     def execute_fusion(self, deuteron, triton):
         self.reaction_count += 1
         self.total_energy_released += energy_released_in_MeV
-        print('Total reactions: ' + str(self.reaction_count) + ", total energy: " + str(
-            self.total_energy_released) + " MeV")
 
         helion = Helion(triton.position.x, triton.position.y, triton.position.z)
         neutron = Neutron(deuteron.position.x, deuteron.position.y, deuteron.position.z)
@@ -201,5 +201,16 @@ class Chamber:
         energy_per_particle = KELost / particle_count
         for i in range(0, particle_count):
             p = self.particles[i]
-            # p.add_energy(energy_per_particle)
+            p.add_energy(energy_per_particle)
         return v * sqrt(1 - wallCoeff)
+
+    def set_dt(self, max_v):
+        if self.scenario == 1 or self.scenario == 6:
+            n_frames = 5
+        else:
+            n_frames = 20
+        self.dt = (self.x / n_frames) / max_v # so that it takes n frames to move across chamber
+
+    def get_chamber_surface_area(self):
+        return 2 * (self.x * self.y + self.x * self.z + self.y * self.z)
+
