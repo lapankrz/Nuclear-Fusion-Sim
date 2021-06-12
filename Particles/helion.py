@@ -11,4 +11,4 @@ class Helion(Particle):
         self.magneticDipoleMoment = C.value("helion mag. mom.")  # [J*T**-1]
 
     def get_color(self):
-        return '#ffe800' # yellow
+        return '#FFDC00' # yellow
