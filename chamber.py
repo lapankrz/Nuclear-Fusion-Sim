@@ -40,6 +40,11 @@ class Chamber:
         self.dt = 1e-9 # [ s ]
         self.min_fusion_dist = 5e-4
         self.set_up_scenario()
+        self.surface_area = self.get_chamber_surface_area()
+        self.laser_energy = self.laser.get_initial_energy(self.surface_area)
+        self.resultant_velocity = 0
+        self.avg_velocity = 0
+        self.avg_vel = 0
 
     def set_up_scenario(self):
         if (self.scenario <= 5):
@@ -163,11 +168,14 @@ class Chamber:
                 v.z = -v.z
                 p.z = self.z
             i += 1
-            resultant_velocity = sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2)
-            self.KEavg += ((m * (resultant_velocity ** 2)) / 2)
+            self.resultant_velocity = sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2)
+            self.KEavg += ((m * (self.resultant_velocity ** 2)) / 2)
+            self.avg_velocity += self.resultant_velocity
             self.iterator += 1
+        self.avg_vel = self.avg_velocity / len(self.particles)
         self.Pressure = (len(self.particles) * self.KEavg / (self.x * self.y * self.z))
         self.Temperature = ((self.KEavg / len(self.particles)) / (3 * C.k))
+        self.avg_velocity = 0
 
     def get_random_position(self):
         random = Random()
